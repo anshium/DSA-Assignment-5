@@ -9,6 +9,7 @@ typedef struct Graph_Structure{
 
 typedef struct Node{
 	int val;
+	int visited;
 	struct Node* next;
 } Node;
 
@@ -31,6 +32,7 @@ Graph initGraph(int num_vertices){
 Node* createNode(int val){
 	Node* n = (Node*)malloc(sizeof(Node));
 	n->val = val;
+	n->visited = 0;
 	n->next = NULL;
 
 	return n;
@@ -54,10 +56,11 @@ int addUndirectedEdge(Graph g, int u, int v){
 // The function that does the work that we have to perform
 Array doTheTask(Graph g){
 	Array journal = (Array)malloc(sizeof(int) * g->num_vertices);
+	assert(journal != NULL);
 
 	journal[0] = g->startList[0]->val; // Basically 1
 
-	
+
 
 	return journal;
 }
