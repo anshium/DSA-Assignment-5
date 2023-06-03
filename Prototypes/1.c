@@ -26,6 +26,10 @@ Graph initGraph(int num_vertices){
 		g->startList[i] = (Node*)malloc(sizeof(Node));
 	}
 
+	for(int i = 0; i < num_vertices; i++){
+		g->startList[i] = NULL;
+	}
+
 	return g;
 }
 
@@ -62,14 +66,38 @@ Array doTheTask(Graph g){
 
 	g->startList[0]->visited = 1;
 
-	for(int i = 1; i < g->num_vertices; i++){
-		
+	nodeptr p = g->startList[0];
+	int minimum = p->val;
+	while(p != NULL){
+		if(p->val < minimum){
+			minimum = p->val;
+		}
+		p = p->next;
 	}
 
 	return journal;
 }
 
+void printGraph(Graph g){
+	for(int i = 0; i < g->num_vertices; i++){
+		nodeptr p = g->startList[i];
+		while(p != NULL){
+			printf("(%d -> %d) ", i + 1, p->val);
+			p = p->next;
+		}
+		printf("\n");
+	}
+}
+
 int main(){
+	Graph g = initGraph(5);
+	addUndirectedEdge(g, 1, 4);
+	addUndirectedEdge(g, 3, 4);
+	addUndirectedEdge(g, 5, 4);
+	addUndirectedEdge(g, 3, 2);
+	addUndirectedEdge(g, 1, 5);
+
+	printGraph(g);
 
 	return 0;
 }
