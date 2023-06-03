@@ -57,22 +57,35 @@ int addUndirectedEdge(Graph g, int u, int v){
 	return 1;	
 }
 
+Node* findMinimumUnvisited(int from){
+	
+}
+
 // The function that does the work that we have to perform
 Array doTheTask(Graph g){
 	Array journal = (Array)malloc(sizeof(int) * g->num_vertices);
 	assert(journal != NULL);
 
-	journal[0] = g->startList[0]->val; // Basically 1
+	journal[0] = 1;
 
 	g->startList[0]->visited = 1;
 
-	nodeptr p = g->startList[0];
-	int minimum = p->val;
-	while(p != NULL){
-		if(p->val < minimum){
-			minimum = p->val;
-		}
-		p = p->next;
+	/*
+		nodeptr t = findMinimumUnvisited(journal[0]);
+		journal[1] = t->val;
+		nodeptr s = findMinimumUnvisited(journal[1]);
+		journal[2] = s->val;
+
+		// Do this until journal is full
+	*/
+	int from = 1;
+	int index = 1;
+	for(int i = 1; i < g->num_vertices; i++){
+		nodeptr temp = findMinimumUnvisited(from);
+		journal[index] = temp->val;
+
+		from = temp->val;
+		index++;
 	}
 
 	return journal;
