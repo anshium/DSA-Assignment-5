@@ -58,30 +58,25 @@ int addUndirectedEdge(Graph g, int u, int v){
 	return 1;	
 }
 
-Node* findMinimumUnvisited(Graph g, int from){
+int findMinimumUnvisited(Graph g, int from){
 	nodeptr p = g->startList[from - 1];
 
 	int minimum = INT_MAX;
-	nodeptr min_node = NULL;
-	nodeptr tempNode = NULL;
 	int test = 0;
 	while(p != NULL){
 		if(g->startList[p->val - 1]->visited == 0){ // or simple initial p->visited
-			tempNode = p;
 			test = p->val;
 		} else{
-			tempNode = findMinimumUnvisited(g, p->val);
-			test = tempNode->val;
+			test = findMinimumUnvisited(g, p->val);
 		}
 
 		if(test < minimum){
 			minimum = test;
-			min_node = tempNode;
 		}
 		p = p->next;
 	}
 
-	return min_node;
+	return minimum;
 }
 
 // The function that does the work that we have to perform
@@ -90,7 +85,7 @@ Array doTheTask(Graph g){
 	assert(journal != NULL);
 
 	journal[0] = 1;
-
+	
 	g->startList[0]->visited = 1;
 
 	/*
@@ -104,15 +99,15 @@ Array doTheTask(Graph g){
 	int from = 1;
 	int index = 1;
 	for(int i = 1; i < g->num_vertices; i++){
-		nodeptr minNode = findMinimumUnvisited(g, from);
-		int temp = minNode->val;
-		g->startList[minNode->val - 1]->visited = 1;
+		int temp = findMinimumUnvisited(g, from);
+		printf("%d\n", temp);
+		g->startList[temp - 1]->visited = 1;
 		journal[index] = temp;
 
 		from = temp;
 		index++;
 	}
-
+	
 	return journal;
 }
 
@@ -136,6 +131,8 @@ int main(){
 	addUndirectedEdge(g, 1, 5);
 
 	printGraph(g);
+
+	doTheTask(g);
 
 	return 0;
 }
