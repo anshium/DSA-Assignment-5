@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <limits.h>
 
 typedef struct Graph_Structure{
 	struct Node** startList;
@@ -57,8 +58,23 @@ int addUndirectedEdge(Graph g, int u, int v){
 	return 1;	
 }
 
-Node* findMinimumUnvisited(int from){
-	
+int findMinimumUnvisited(Graph g, int from){
+	nodeptr p = g->startList[from - 1];
+
+	int minimum = INT_MAX;
+	int test = 0;
+	while(p != NULL){
+		if(g->startList[p->val - 1]->visited == 0){
+			test = p->val;
+		} else{
+			test = findMinimumUnvisited(g, p->val);
+		}
+
+		if(test < minimum){
+			minimum = test;
+		}
+		p = p->next;
+	}
 }
 
 // The function that does the work that we have to perform
@@ -76,15 +92,15 @@ Array doTheTask(Graph g){
 		nodeptr s = findMinimumUnvisited(journal[1]);
 		journal[2] = s->val;
 
-		// Do this until journal is full
+		// Do this until the journal is full
 	*/
 	int from = 1;
 	int index = 1;
 	for(int i = 1; i < g->num_vertices; i++){
-		nodeptr temp = findMinimumUnvisited(from);
-		journal[index] = temp->val;
+		int temp = findMinimumUnvisited(g, from);
+		journal[index] = temp;
 
-		from = temp->val;
+		from = temp;
 		index++;
 	}
 
