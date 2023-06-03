@@ -59,8 +59,9 @@ int addUndirectedEdge(Graph g, int u, int v){
 	return 1;	
 }
 
-int findMinimumUnvisited(Graph g, int from){
+int findMinimumUnvisited(Graph g, int from, int initialValue){
 	nodeptr p = g->startList[from - 1];
+	int initialVal = initialValue;
 
 	int minimum = INT_MAX;
 	int test = 0;
@@ -69,11 +70,16 @@ int findMinimumUnvisited(Graph g, int from){
 		if(g->startList[p->val - 1]->visited == 0){ // or simple initial p->visited
 			test = p->val;
 		} else{
-			// if(p->val == initialVal){
-			// 	p = p->next;
-			// 	continue;
-			// }
-			test = findMinimumUnvisited(g, p->val);
+			if(p->val == initialVal){
+				p = p->next;
+				continue;
+			}
+			if(p->idkname == initialVal){
+				p = p->next;
+				continue;
+			}
+			p->idkname = initialVal;
+			test = findMinimumUnvisited(g, p->val, initialVal);
 		}
 
 		if(test < minimum){
@@ -105,8 +111,8 @@ Array doTheTask(Graph g){
 	int from = 1;
 	int index = 1;
 	for(int i = 1; i < g->num_vertices; i++){
-		int temp = findMinimumUnvisited(g, from);
-		printf("%d\n", temp);
+		int temp = findMinimumUnvisited(g, from, from);
+		// printf("%d\n", temp);
 		g->startList[temp - 1]->visited = 1;
 		journal[index] = temp;
 
@@ -138,7 +144,12 @@ int main(){
 
 	printGraph(g);
 
-	doTheTask(g);
+	Array journal = doTheTask(g);
+
+	for(int i = 0; i < 5; i++){
+		printf("%d ", journal[i]);
+	}
+	printf("\n");
 
 	return 0;
 }
