@@ -10,6 +10,7 @@ typedef struct Graph_Structure{
 
 typedef struct Node{
 	int val;
+	int idkname;
 	int visited;
 	struct Node* next;
 } Node;
@@ -64,9 +65,14 @@ int findMinimumUnvisited(Graph g, int from){
 	int minimum = INT_MAX;
 	int test = 0;
 	while(p != NULL){
+		// printf("Hello\n");
 		if(g->startList[p->val - 1]->visited == 0){ // or simple initial p->visited
 			test = p->val;
 		} else{
+			// if(p->val == initialVal){
+			// 	p = p->next;
+			// 	continue;
+			// }
 			test = findMinimumUnvisited(g, p->val);
 		}
 
