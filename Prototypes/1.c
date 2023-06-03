@@ -23,7 +23,7 @@ Graph initGraph(int num_vertices){
 	g->startList = (Node**)malloc(sizeof(Node*) * num_vertices);
 	g->num_vertices = num_vertices;
 	for(int i = 0; i < num_vertices; i++){
-		g->startList[i] = (Node*)malloc(sizeof(Node));
+		g->startList[i] = (Node*)malloc(sizeof(Node) * 2); // The second node's value would tell if it has been visited
 	}
 
 	return g;
@@ -32,7 +32,6 @@ Graph initGraph(int num_vertices){
 Node* createNode(int val){
 	Node* n = (Node*)malloc(sizeof(Node));
 	n->val = val;
-	n->visited = 0;
 	n->next = NULL;
 
 	return n;
@@ -60,7 +59,9 @@ Array doTheTask(Graph g){
 
 	journal[0] = g->startList[0]->val; // Basically 1
 
+	for(int i = 1; i < g->num_vertices; i++){
 
+	}
 
 	return journal;
 }
