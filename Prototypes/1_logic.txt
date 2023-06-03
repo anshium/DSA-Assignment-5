@@ -1,0 +1,17 @@
+Here is the logic that I am going to use:
+
+We all know that we are going to start with 1, so shall be the first visited planet.
+
+Then from one, we'll look at all the nodes that it is directly connected to.
+In this step we shall find the one that is the smallest of all.
+
+Then I will be at the second planet.
+From there, I will go to all its neighbours and check for the smallest. However if there is a neighbour that has already been visited, then recursively (or otherwise) I will see all of their connections. Keep in mind that here I will only see those connections that can be reached from the starting point either directly or through already visited connections and then compare my choices of finding the smallest of all.
+
+This would continue till I visit all the planets (probably indicated by a counter or the number of planets filled in the journal)
+
+Cool!
+
+Complexity:
+	(O(n) for the shortest one)
+	Not very sure but believe that this logic would fit into the contraints provided.

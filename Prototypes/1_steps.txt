@@ -1,0 +1,7 @@
+1. Create elements of graph in the code
+
+2. Take input
+
+3. Make the graph using the input
+
+4. 
