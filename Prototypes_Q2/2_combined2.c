@@ -232,7 +232,7 @@ void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v){
 
 	int i, j;
 
-	int current;
+	int current, myVal;
 
 	U->upDownArray[0][0] = 0;
 
@@ -240,40 +240,65 @@ void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v){
 	// Check all adjacent cells that can be reached from the current cell (R, C). If an adjacent cell is within the grid boundaries and has a different height, enqueue it.
 	// Update the distance of the adjacent cell if it is not visited or if the new distance is smaller than the previously recorded distance.
 	// Mark the adjacent cell as visited.
-
 	while(!isEmpty(Q)){
 		listnodeptr l = dequeue(Q);
-		int i = l->x;
-		int j = l->y;
+		i = l->x;
+		j = l->y;
+		A->AdjacencyMatrixArray[i][j].visited = VISITED;
 		
 		int current = G->graphArray[i][j];
 		int myVal = U->upDownArray[i][j];
 
 
 		if(A->AdjacencyMatrixArray[i][j].top == 1){
-			if(current != G->graphArray[i - 1][j]){
+			if(A->AdjacencyMatrixArray[i - 1][j].visited == NOT_VISITED){
 				enqueue(Q, i - 1, j);
 			}
 
-			if(A->AdjacencyMatrixArray[i - 1][j].visited == NOT_VISITED || U->upDownArray[i - 1][j] > myVal){
-				U->upDownArray[i - 1][j] = U->upDownArray[i][j] + 1;
+			if(U->upDownArray[i - 1][j] > myVal){
+				enqueue(Q, i - 1, j);
+				U->upDownArray[i - 1][j] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i - 1][j]);
 			}
 		}
 		if(A->AdjacencyMatrixArray[i][j].bottom == 1){
-			if(current != G->graphArray[i + 1][j]){
+			if(A->AdjacencyMatrixArray[i + 1][j].visited == NOT_VISITED){
 				enqueue(Q, i + 1, j);
+			}
+
+			if(U->upDownArray[i + 1][j] > myVal){
+				enqueue(Q, i + 1, j);
+				U->upDownArray[i + 1][j] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i + 1][j]);
 			}
 		}
 		if(A->AdjacencyMatrixArray[i][j].left == 1){
-			if(current != G->graphArray[i][j - 1]){
+			if(A->AdjacencyMatrixArray[i][j - 1].visited == NOT_VISITED){
 				enqueue(Q, i, j - 1);
+			}
+
+			if(U->upDownArray[i][j - 1] > myVal){
+				enqueue(Q, i, j - 1);
+				U->upDownArray[i][j - 1] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i][j - 1]);
 			}
 		}
 		if(A->AdjacencyMatrixArray[i][j].right == 1){
-			if(current != G->graphArray[i][j + 1]){
+			if(A->AdjacencyMatrixArray[i][j + 1].visited == NOT_VISITED){
 				enqueue(Q, i, j + 1);
 			}
+
+			if(U->upDownArray[i][j + 1] > myVal){
+				enqueue(Q, i, j + 1);
+				U->upDownArray[i][j + 1] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i][j + 1]);
+			}
 		}
+	}
+}
+
+void print(upDownList U){
+	for(int i = 0; i < U->N; i++){
+		for(int j = 0; j < U->M; j++){
+			printf("%d ", U->upDownArray[i][j]);
+		}
+		printf("\n");
 	}
 }
 
@@ -291,6 +316,11 @@ int main(){
 	AdjacencyMatrix A = initAdjacencyMatrix(N, M);
 
 	doTheThingdotCom(G, U, A, 0, 0);
+
+	printf("\n");
+	
+	print(U);
+
 	printf("%d\n", U->upDownArray[N - 1][M - 1]);
 	return 0;
 }
