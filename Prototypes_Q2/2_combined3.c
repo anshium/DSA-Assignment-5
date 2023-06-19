@@ -1,6 +1,11 @@
+// Steps taken to remove MLE
+// No more adjacency lists
+// Graph would have each node as a struct that would store visited and value
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <stdbool.h>
+#include <limits.h>
 
 typedef struct ListNode{
 	int x;
@@ -14,7 +19,6 @@ typedef ListNode* listnodeptr;
 typedef struct QueueInfo{
 	int num_elems;
 	List L;
-	listnodeptr front;
 	listnodeptr rear;
 } QueueInfo;
 
@@ -29,7 +33,7 @@ listnodeptr dequeue(Queue Q);
 
 void printQueue(Queue Q);
 
-int isEmpty(Queue Q);
+bool isEmpty(Queue Q);
 
 Queue createQueue(){
 	Queue Q = (Queue)malloc(sizeof(QueueInfo));
@@ -84,21 +88,22 @@ void printQueue(Queue Q){
 	printf("\n");
 }
 
-int isEmpty(Queue Q){
+bool isEmpty(Queue Q){
 	if(Q->num_elems == 0){
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
+typedef struct holder{
+	short value;
+	bool visited;
+} holder;
 
 typedef struct GraphNode{
 	int N;
 	int M;
-	int** graphArray;
+	holder** graphArray;
 } GraphNode;
 
 typedef GraphNode* Graph;
@@ -110,7 +115,7 @@ Graph initGraph(int N, int M);
 typedef struct upDownListNode{
 	int N;
 	int M;
-	int** upDownArray;
+	short** upDownArray;
 } upDownListNode;
 
 typedef upDownListNode* upDownList;
@@ -118,41 +123,24 @@ typedef upDownListNode* upDownList;
 #define NOT_VISITED 0
 #define VISITED 1
 
-#define QUEUED 1
-#define NOT_QUEUED 0
-
-// If 1, then you can visit that part, else no
-typedef struct upDownTeller{
-	int visited;
-	int queued;
-	int left;
-	int right;
-	int top;
-	int bottom;
-} upDownTeller;
-
-typedef struct stAdjacencyMatrix{
-	int N;
-	int M;
-	upDownTeller** AdjacencyMatrixArray;
-} stAdjacencyMatrix;
-
-typedef stAdjacencyMatrix* AdjacencyMatrix;
-
-AdjacencyMatrix initAdjacencyMatrix(int N, int M);
-
 upDownList initUpDownList(int N, int M);
 
-void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v);
+void doTheThingdotCom(Graph G, upDownList U, int u, int v);
 
 Graph initGraph(int N, int M){
 	Graph G = (Graph)malloc(sizeof(GraphNode));
 	G->N = N;
 	G->M = M;
 
-	G->graphArray = (int**)malloc(sizeof(int*) * N);
+	G->graphArray = (holder**)malloc(sizeof(holder*) * N);
 	for(int i = 0; i < N; i++){
-		G->graphArray[i] = (int*)malloc(sizeof(int) * M);
+		G->graphArray[i] = (holder*)malloc(sizeof(holder) * M);
+	}
+
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < M; j++){
+			G->graphArray[i][j].value = false;
+		}
 	}
 
 	return G;
@@ -163,58 +151,18 @@ upDownList initUpDownList(int N, int M){
 	U->N = N;
 	U->M = M;
 
-	U->upDownArray = (int**)malloc(sizeof(int*) * N);
+	U->upDownArray = (short**)malloc(sizeof(short*) * N);
 	for(int i = 0; i < N; i++){
-		U->upDownArray[i] = (int*)malloc(sizeof(int) * M);
+		U->upDownArray[i] = (short*)malloc(sizeof(short) * M);
 	}
 
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < M; j++){
-			U->upDownArray[i][j] = INT_MAX;
+			U->upDownArray[i][j] = 32767;
 		}
 	}
 
 	return U;
-}
-
-AdjacencyMatrix initAdjacencyMatrix(int N, int M){
-	AdjacencyMatrix A = (AdjacencyMatrix)malloc(sizeof(stAdjacencyMatrix));
-	A->AdjacencyMatrixArray = (upDownTeller**)malloc(sizeof(upDownTeller*) * N);
-	for(int i = 0; i < N; i++){
-		A->AdjacencyMatrixArray[i] = (upDownTeller*)malloc(sizeof(upDownTeller) * M);
-	}
-
-	for(int i = 0; i < N; i++){
-		for(int j = 0; j < M; j++){
-			A->AdjacencyMatrixArray[i][j].visited = NOT_VISITED;
-			A->AdjacencyMatrixArray[i][j].queued = NOT_QUEUED;
-			if(i != 0){
-				A->AdjacencyMatrixArray[i][j].top = 1;
-			} else{
-				A->AdjacencyMatrixArray[i][j].top = 0;
-			}
-
-			if(i != N - 1){
-				A->AdjacencyMatrixArray[i][j].bottom = 1;
-			} else{
-				A->AdjacencyMatrixArray[i][j].bottom = 0;
-			}
-
-			if(j != 0){
-				A->AdjacencyMatrixArray[i][j].left = 1;
-			} else {
-				A->AdjacencyMatrixArray[i][j].left = 0;
-			}
-
-			if(j != M - 1){
-				A->AdjacencyMatrixArray[i][j].right = 1;
-			} else {
-				A->AdjacencyMatrixArray[i][j].right = 0;
-			}
-		}
-	}
-
-	return A;
 }
 
 // pick up one element
@@ -226,16 +174,17 @@ AdjacencyMatrix initAdjacencyMatrix(int N, int M){
 
 // as easy as that
 
-void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v){
+void doTheThingdotCom(Graph G, upDownList U, int u, int v){
 	Queue Q = createQueue();
 	enqueue(Q, 0, 0);
 
 	int i, j;
 
-	int current, myVal;
+	short current, myVal;
 
 	U->upDownArray[0][0] = 0;
-
+	int N = G->N;
+	int M = G->M;
 	// Dequeue a cell from the queue.
 	// Check all adjacent cells that can be reached from the current cell (R, C). If an adjacent cell is within the grid boundaries and has a different height, enqueue it.
 	// Update the distance of the adjacent cell if it is not visited or if the new distance is smaller than the previously recorded distance.
@@ -244,53 +193,57 @@ void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v){
 		listnodeptr l = dequeue(Q);
 		i = l->x;
 		j = l->y;
-		A->AdjacencyMatrixArray[i][j].visited = VISITED;
+		// free(l);
+		G->graphArray[i][j].visited = true;
 		
-		int current = G->graphArray[i][j];
-		int myVal = U->upDownArray[i][j];
+		current = G->graphArray[i][j].value;
+		myVal = U->upDownArray[i][j];
 
 
-		if(A->AdjacencyMatrixArray[i][j].top == 1){
-			if(A->AdjacencyMatrixArray[i - 1][j].visited == NOT_VISITED){
+		if(i >= 1){
+			if(G->graphArray[i - 1][j].visited == false){
 				enqueue(Q, i - 1, j);
 			}
 
 			if(U->upDownArray[i - 1][j] > myVal){
 				enqueue(Q, i - 1, j);
-				U->upDownArray[i - 1][j] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i - 1][j]);
+				U->upDownArray[i - 1][j] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i - 1][j].value);
 			}
 		}
-		if(A->AdjacencyMatrixArray[i][j].bottom == 1){
-			if(A->AdjacencyMatrixArray[i + 1][j].visited == NOT_VISITED){
+		if(i < N - 1){
+			if(G->graphArray[i + 1][j].visited == false){
 				enqueue(Q, i + 1, j);
 			}
 
 			if(U->upDownArray[i + 1][j] > myVal){
 				enqueue(Q, i + 1, j);
-				U->upDownArray[i + 1][j] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i + 1][j]);
+				U->upDownArray[i + 1][j] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i + 1][j].value);
 			}
 		}
-		if(A->AdjacencyMatrixArray[i][j].left == 1){
-			if(A->AdjacencyMatrixArray[i][j - 1].visited == NOT_VISITED){
+		if(j >= 1){
+			if(G->graphArray[i][j - 1].visited == false){
 				enqueue(Q, i, j - 1);
 			}
 
 			if(U->upDownArray[i][j - 1] > myVal){
 				enqueue(Q, i, j - 1);
-				U->upDownArray[i][j - 1] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i][j - 1]);
+				U->upDownArray[i][j - 1] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i][j - 1].value);
 			}
 		}
-		if(A->AdjacencyMatrixArray[i][j].right == 1){
-			if(A->AdjacencyMatrixArray[i][j + 1].visited == NOT_VISITED){
+		if(j < M - 1){
+			if(G->graphArray[i][j + 1].visited == false){
 				enqueue(Q, i, j + 1);
 			}
 
 			if(U->upDownArray[i][j + 1] > myVal){
 				enqueue(Q, i, j + 1);
-				U->upDownArray[i][j + 1] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i][j + 1]);
+				U->upDownArray[i][j + 1] = U->upDownArray[i][j] + 1 * (current != G->graphArray[i][j + 1].value);
 			}
 		}
 	}
+	// free(Q->L);
+	// free(Q->rear);
+	// free(Q);
 }
 
 void print(upDownList U){
@@ -310,14 +263,6 @@ void freeGraph(Graph G){
 	free(G);
 }
 
-void freeAM(AdjacencyMatrix A){
-	for(int i = 0; i < A->N; i++){
-		free(A->AdjacencyMatrixArray[i]);
-	}
-
-	free(A);
-}
-
 void freeUDL(upDownList U){
 	for(int i = 0; i < U->N; i++){
 		free(U->upDownArray[i]);
@@ -333,21 +278,18 @@ int main(){
 	int N, M;
 	Graph G;
 	upDownList U;
-	AdjacencyMatrix A;
 
-	for(int i = 0; i < T; i++){
+	// for(int i = 0; i < T; i++){
 		scanf("%d %d", &N, &M);
 		G = initGraph(N, M);
 		for(int i = 0; i < N; i++){
 			for(int j = 0; j < M; j++){
-				scanf("%d", &G->graphArray[i][j]);
+				scanf("%hi", &G->graphArray[i][j]);
 			}
 		}
 
 		U = initUpDownList(N, M);
-		A = initAdjacencyMatrix(N, M);
-
-		doTheThingdotCom(G, U, A, 0, 0);
+		doTheThingdotCom(G, U, 0, 0);
 
 		// printf("\n");
 		
@@ -355,9 +297,8 @@ int main(){
 
 		printf("%d\n", U->upDownArray[N - 1][M - 1]);
 
-		freeGraph(G);
-		freeAM(A);
-		freeUDL(U);
-	}
+		// freeGraph(G);
+		// freeUDL(U);
+	// }
 	return 0;
 }
