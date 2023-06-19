@@ -236,8 +236,44 @@ void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v){
 
 	U->upDownArray[0][0] = 0;
 
+	// Dequeue a cell from the queue.
+	// Check all adjacent cells that can be reached from the current cell (R, C). If an adjacent cell is within the grid boundaries and has a different height, enqueue it.
+	// Update the distance of the adjacent cell if it is not visited or if the new distance is smaller than the previously recorded distance.
+	// Mark the adjacent cell as visited.
+
 	while(!isEmpty(Q)){
+		listnodeptr l = dequeue(Q);
+		int i = l->x;
+		int j = l->y;
 		
+		int current = G->graphArray[i][j];
+		int myVal = U->upDownArray[i][j];
+
+
+		if(A->AdjacencyMatrixArray[i][j].top == 1){
+			if(current != G->graphArray[i - 1][j]){
+				enqueue(Q, i - 1, j);
+			}
+
+			if(A->AdjacencyMatrixArray[i - 1][j].visited == NOT_VISITED || U->upDownArray[i - 1][j] > myVal){
+				U->upDownArray[i - 1][j] = U->upDownArray[i][j] + 1;
+			}
+		}
+		if(A->AdjacencyMatrixArray[i][j].bottom == 1){
+			if(current != G->graphArray[i + 1][j]){
+				enqueue(Q, i + 1, j);
+			}
+		}
+		if(A->AdjacencyMatrixArray[i][j].left == 1){
+			if(current != G->graphArray[i][j - 1]){
+				enqueue(Q, i, j - 1);
+			}
+		}
+		if(A->AdjacencyMatrixArray[i][j].right == 1){
+			if(current != G->graphArray[i][j + 1]){
+				enqueue(Q, i, j + 1);
+			}
+		}
 	}
 }
 
