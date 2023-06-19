@@ -17,10 +17,14 @@ Graph initGraph(int N, int M);
 
 // Although I could have reused the graph declaration, I would be making a separate upDownList
 
-typedef struct upDownList{
+typedef struct upDownListNode{
 	int N;
 	int M;
-	int** upDownList;
-}
+	int** upDownArray;
+} upDownListNode;
+
+typedef upDownListNode* upDownList;
+
+upDownList initUpDownList(int N, int M);
 
 #endif

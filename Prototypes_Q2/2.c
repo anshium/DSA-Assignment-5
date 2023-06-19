@@ -12,7 +12,15 @@ int main(){
 		}
 	}
 
+	doTheThingdotCom(Graph G, upDownList);
+	pick up one element
+	update all valid with the up down thingy if that is less
+
+	for all elements adjacent to it:
+		if(not visited)
+			put them in a queue
 	
+	as easy as that
 
 	return 0;
 }
