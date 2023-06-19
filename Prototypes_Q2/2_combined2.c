@@ -317,9 +317,9 @@ int main(){
 
 	doTheThingdotCom(G, U, A, 0, 0);
 
-	printf("\n");
+	// printf("\n");
 	
-	print(U);
+	// print(U);
 
 	printf("%d\n", U->upDownArray[N - 1][M - 1]);
 	return 0;
