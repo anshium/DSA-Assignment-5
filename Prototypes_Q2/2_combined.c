@@ -1,6 +1,149 @@
-#include "graph.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+
+typedef struct ListNode{
+	int x;
+	int y;
+	struct ListNode* next;
+} ListNode;
+
+typedef ListNode* List;
+typedef ListNode* listnodeptr;
+
+typedef struct QueueInfo{
+	int num_elems;
+	List L;
+	listnodeptr front;
+	listnodeptr rear;
+} QueueInfo;
+
+typedef QueueInfo* Queue;
+typedef Queue queueptr;
+
+Queue createQueue();
+
+void enqueue(Queue Q, int x, int y);
+
+listnodeptr dequeue(Queue Q);
+
+void printQueue(Queue Q);
+
+int isEmpty(Queue Q);
+
+Queue createQueue(){
+	Queue Q = (Queue)malloc(sizeof(QueueInfo));
+	Q->num_elems = 0;
+	Q->L = (listnodeptr)malloc(sizeof(ListNode));
+	Q->L->x = 0;
+	Q->L->y = 0;
+	Q->L->next = NULL;
+	Q->rear = Q->L;
+
+	return Q;
+}
+
+listnodeptr makeListNode(int x, int y){
+	listnodeptr l = (listnodeptr)malloc(sizeof(ListNode));
+	l->x = x;
+	l->y = y;
+	l->next = NULL;
+
+	return l;
+}
+
+void enqueue(Queue Q, int x, int y){
+	if(Q->num_elems == 0){
+		Q->rear = Q->L;
+	}
+	Q->rear->next = makeListNode(x, y);
+	Q->rear = Q->rear->next;
+	Q->num_elems += 1;
+	return;
+}
+
+listnodeptr dequeue(Queue Q){
+	if(isEmpty(Q)){
+		return NULL;
+	}
+	
+	listnodeptr p = Q->L->next;
+	Q->L->next = Q->L->next->next;
+	Q->num_elems -= 1;
+	
+	return p;
+}
+
+void printQueue(Queue Q){
+	listnodeptr p = Q->L->next;
+	for(int i = 0; i < Q->num_elems; i++){
+		printf("(%d, %d) ", p->x, p->y);
+		p = p->next;
+	}
+		// printf("%d ", p->val);
+	printf("\n");
+}
+
+int isEmpty(Queue Q){
+	if(Q->num_elems == 0){
+		return 1;
+	}
+	return 0;
+}
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
-#include "queue.h"
+
+typedef struct GraphNode{
+	int N;
+	int M;
+	int** graphArray;
+} GraphNode;
+
+typedef GraphNode* Graph;
+
+Graph initGraph(int N, int M);
+
+// Although I could have reused the graph declaration, I would be making a separate upDownList
+
+typedef struct upDownListNode{
+	int N;
+	int M;
+	int** upDownArray;
+} upDownListNode;
+
+typedef upDownListNode* upDownList;
+
+#define NOT_VISITED 0
+#define VISITED 1
+
+#define QUEUED 1
+#define NOT_QUEUED 0
+
+// If 1, then you can visit that part, else no
+typedef struct upDownTeller{
+	int visited;
+	int queued;
+	int left;
+	int right;
+	int top;
+	int bottom;
+} upDownTeller;
+
+typedef struct stAdjacencyMatrix{
+	int N;
+	int M;
+	upDownTeller** AdjacencyMatrixArray;
+} stAdjacencyMatrix;
+
+typedef stAdjacencyMatrix* AdjacencyMatrix;
+
+AdjacencyMatrix initAdjacencyMatrix(int N, int M);
+
+upDownList initUpDownList(int N, int M);
+
+void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v);
 
 Graph initGraph(int N, int M){
 	Graph G = (Graph)malloc(sizeof(GraphNode));
@@ -229,4 +372,22 @@ void doTheThingdotCom(Graph G, upDownList U, AdjacencyMatrix A, int u, int v){
 			}
 		}
 	}
+}
+
+int main(){
+	int N, M;
+	scanf("%d %d", &N, &M);
+	Graph G = initGraph(N, M);
+	for(int i = 0; i < N; i++){
+		for(int j = 0; j < M; j++){
+			scanf("%d", &G->graphArray[i][j]);
+		}
+	}
+
+	upDownList U = initUpDownList(N, M);
+	AdjacencyMatrix A = initAdjacencyMatrix(N, M);
+
+	doTheThingdotCom(G, U, A, 0, 0);
+	printf("%d\n", U->upDownArray[N - 1][M - 1]);
+	return 0;
 }

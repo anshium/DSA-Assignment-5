@@ -2,6 +2,15 @@
 
 // Add testcases also
 
+void print(upDownList U){
+	for(int i = 0; i < U->N; i++){
+		for(int j = 0; j < U->M; j++){
+			printf("%d ", U->upDownArray[i][j]);
+		}
+		printf("\n");
+	}
+}
+
 int main(){
 	int N, M;
 	scanf("%d %d", &N, &M);
@@ -12,15 +21,16 @@ int main(){
 		}
 	}
 
-	doTheThingdotCom(Graph G, upDownList);
-	pick up one element
-	update all valid with the up down thingy if that is less
+	upDownList U = initUpDownList(N, M);
+	AdjacencyMatrix A = initAdjacencyMatrix(N, M);
 
-	for all elements adjacent to it:
-		if(not visited)
-			put them in a queue
+	doTheThingdotCom(G, U, A, 0, 0);
+
+	printf("\n");
 	
-	as easy as that
+	print(U);
+
+	printf("%d\n", U->upDownArray[N - 1][M - 1]);
 
 	return 0;
 }
