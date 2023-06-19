@@ -1,0 +1,10 @@
+Here is the logic that I am finally going to follow.
+
+I'll start with (0, 0). I'll do dfs on it such that all the nodes I encompass would be of the same type - fertile or non-fertile.
+
+Herein, I will put all the dissimilar type of nodes which are not visited in a queue.
+
+Then I'll start with the queue. I shall traverse all the nodes and do bfs on them which have not been visited.
+
+After I realise I am in a fertile not-visited area, I would start the counter and calcuate the cost. I would then compare the calculated cost with the already calcuated maximum and find which is the maximum.
+
