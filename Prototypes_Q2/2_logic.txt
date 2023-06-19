@@ -1,0 +1,10 @@
+I will be basing my approach on the flood fill algorithm.
+
+I would be doing the following:
+
+1. Start with (1, 1) - 1 indexing
+2. Flood fill all around it with the same height.
+3. While doing 2, add everything that was at the non-grid boundary to some datatype.
+4. Then one by one, extract them and recursively do flood fill on each of them and try to reach (N, N)
+5. Count the steps in the meanwhile.
+6. Once reached the (N, N) point, check if the number of times the elevator was used.
